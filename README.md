@@ -8,7 +8,7 @@ Special thanks to: Teapot-Apple, matt73210, Atomique13, jedi 2^10, Rappetor, and
 
 1. Backup your config  
 2. Download Armbian Imager, insert your 32GB EMMC (note that 8GB will NOT work), Select BTT (BIQU) Manufacturer, Select BigTreeTech CB1 Board, Select Minimal tab, then Armbian <release date> Trixie cli, then Erase and Flash  
-3. On the eMMC, edit /boot/armbianEnv.txt, COPY your `rootdev=UUID=`, then replace everything else with:  
+3. On the eMMC, edit /boot/armbianEnv.txt, COPY your `rootdev=UUID=` (for example, save this line: `rootdev=UUID=938afde5-6689-4a1a-a044-680f6247d523` NOTE that your UUID will be unique to you!) then replace everything else with:  
 ```
 verbosity=1
 bootlogo=false
