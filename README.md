@@ -123,7 +123,9 @@ RequiredForOnline=no
 4. Reboot:  
 `sudo reboot now`  
 
-5. Next, upload your printer.cfg. You need to COMMENT out all mcu/extruder_mcu/mcu hot_mcu sections, then reboot! This is so we can see the canbus IDs to note and to flash.  
+5. Next, upload your printer.cfg. You need to COMMENT out all mcu/extruder_mcu/mcu hot_mcu sections, then reboot (I recommend a hard power off, then power back on. Sometimes a soft reboot I was still not able to see the canbus IDs) 
+
+This is so we can see the canbus IDs to note and to flash.  
 Thanks to Teapot-Apple on the discord for this note.  
 
 Note the following:  
