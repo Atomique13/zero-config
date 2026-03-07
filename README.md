@@ -91,9 +91,11 @@ In Orca (or your preferred slicer) add `TIMELAPSE_TAKE_FRAME` to:
 ## Set up CAN
 
 1. It should be, but check that this service is "loaded active running"  
-`systemctl | grep systemd-networkd`  
+`systemctl | grep systemd-networkd`
 
-2. Configure the txqueuelen for can0:  
+If not, `sudo systemctl enable systemd-networkd`, then `sudo systemctl start systemd-networkd`, then `sudo systemctl disable systemd-networkd-wait-online.service` then check again that it is running  
+
+3. Configure the txqueuelen for can0:  
 ```
 echo -e 'SUBSYSTEM=="net", ACTION=="change|add", KERNEL=="can*"  ATTR{tx_queue_len}="128"' | sudo tee /etc/udev/rules.d/10-can.rules > /dev/null
 ```  
