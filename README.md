@@ -27,7 +27,7 @@ You can fix the partition size now if you have access to another linux host:
 
 If not, I believe it will do it on first boot.  
 
-**Note:** On Mac you’ll need a VM for accessing the emmc after flashing- you just need this VM to access the file system on your emmc, so you can use UTM and pick an easy to setup / use Linux VM (Matt suggested: Debian 11 xfce or something easy)
+**Note:** On Mac you’ll need a VM and to share the EMMC drive to it after flashing- you just need this VM to access the file system on your EMMC, so you can use UTM and pick an easy to setup / use Linux VM (Matt suggested: Debian 11 xfce or something easy)
 
 4. You can either use an Ethernet cable and then SSH in (if it asks, default user is `root` / password `1234`), or connect a keyboard to the printer, and an HDMI from printer to a monitor, then follow the first login steps. Note that if you're going to be using wifi, DO NOT configure it here when it asks. Select `N` and just configure it later with `armbian-config`. My installs (on here and my SV08) just froze at this step.  
 You can run `sudo armbian-config` and under network you can add your wifi.  
