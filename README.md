@@ -326,7 +326,9 @@ Reference Rappetor's guide Step 6/Step 7 to get you through it.
 
 ## Finishing Up
 
-0. You can use my config (uploaded here), or go through and edit yours. Note that when you start, IF using the original Sovol config, you'll need to play "remove config whack-a-mole" to remove things we cannot use anymore. That consists of removing a section klipper errors out about, then going back and removing the next thing. Do this til no errors.  
+0. You can use my config (uploaded here), or go through and edit yours. Note that when you start, IF using the original Sovol config, you'll need to play "remove config whack-a-mole" to remove things we cannot use anymore. That consists of removing a section klipper errors out about, then going back and removing the next thing. Do this til no errors. 
+
+IMO, just start with your printer.cfg, an eddy config, and very basic macros. You don't want to use the old Sovol stuff, especially **not** `klippy/extras/probe_eddy_current.py` and `klippy/extras/probe.py` as we will be setting up the probe with normal Klipper  
 
 1. Change all `canbus_uuid` in your configs to your new ones. Save and restart. Everything should connect.  
 
