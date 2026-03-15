@@ -382,6 +382,8 @@ I did this change:
 and then add `Nice=-10` to the bottom of what is already there  
 and restarted, and it fixed it  
 
+Also, if you get a reg_drive_current of 15, it might help to bump it up to 16, that seems to be the common working value  
+
 6. PID tune, SHAPER_CALIBRATE, etc  
 
 7. Print!
