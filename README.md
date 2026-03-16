@@ -382,14 +382,19 @@ I did this change:
 and then add `Nice=-10` to the bottom of what is already there  
 and restarted, and it fixed it  
 
-Also, if you get a `reg_drive_current of 15`, it might help to bump it up to 16, that seems to be the common working value  
-If you leave it at 15, you may end up with error `Error during homing probe: Trigger analog error: RAW_RANGE`  
-If that's the case, change it manually to 16, `SAVE_CONFIG`, then run:
+> [!IMPORTANT]
+> Note regarding Eddy calibration
+
+If you get a `reg_drive_current` of `15`, it might help to bump it up to `16`, that seems to be the common working value  
+If you leave it at `15`, you may end up with error `Error during homing probe: Trigger analog error: RAW_RANGE`  
+If that's the case, change it manually to `16`, `SAVE_CONFIG`, then run:
 ```
 SET_KINEMATIC_POSITION X=96 Y=76.2 Z=2
 PROBE_EDDY_CURRENT_CALIBRATE CHIP=my_eddy_probe
 ```
 do paper test, and re-set your `tap_threshold` again  
+
+If you just change that value and try to home WITHOUT recalibration with `PROBE_EDDY_CURRENT_CALIBRATE CHIP=my_eddy_probe` , **your toolhead will crash into the bed, you have been warned!**  
 
 6. PID tune, SHAPER_CALIBRATE, etc  
 
