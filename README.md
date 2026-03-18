@@ -201,7 +201,7 @@ You should see your CANBUS devices here, if you don't, something above was done 
 > 
 > **Method Two** is using an ST-LINK (or possibly in the future, command line) to flash a 32KiB offset Katapult bootloader, then from command line, flashing Klipper
 >
-> **Optional:** Deployer firmwares [katapult_deployer](`./menuconfig/katapult_deployer`) are intended to be flashed over the stock Sovol bootloader. Do not use this as a standalone or with ST-LINK. Those expect you to flash Klipper firmware immediately after the deployer is flashed.This is optional but recommended.
+> **Optional:** Deployer firmwares [katapult_deployer](./menuconfig/katapult_deployer) are intended to be flashed over the stock Sovol bootloader. Do not use this as a standalone or with ST-LINK. Those expect you to flash Klipper firmware immediately after the deployer is flashed.This is optional but recommended.
 > 
 > It is up to you to determine which method you think is right and what you want to do. I have personally tested both options and they both work. You can use the firmware bins inside [klipper](./menuconfig/klipper) if you need to.
 
