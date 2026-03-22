@@ -16,10 +16,11 @@ Special thanks to Leoboi420, Teapot-Apple, matt73210, Atomique13, J&B, jedi 2^10
 - [Install Core Software](#install-core-software)
 - [Set Up CAN](#set-up-can)
 - [Firmware Binaries](#firmware-binaries)
-- [Flash Mainboard](#flash-mainboard)
+- [Build and Flash Mainboard](#build-and-flash-mainboard)
 - [Build and Flash Toolhead and Chamber](#build-and-flash-toolhead-and-chamber)
 - [If Something Goes Wrong](#if-something-goes-wrong)
 - [Finishing Up](#finishing-up)
+- [Updater Script](#updater-script)
 
 ---
 
@@ -44,14 +45,14 @@ Special thanks to Leoboi420, Teapot-Apple, matt73210, Atomique13, J&B, jedi 2^10
 1. Back up your stock eMMC and any current configs/data.
 
 2. Flash Armbian to the 32GB eMMC using Armbian Imager:
-- Manufacturer: `BTT (BIQU)`
-- Board: `BigTreeTech CB1`
-- Image: `Minimal -> Armbian <release date> Trixie CLI`
-- Then run erase + flash.
+   - Manufacturer: `BTT (BIQU)`
+   - Board: `BigTreeTech CB1`
+   - Image: `Minimal -> Armbian <release date> Trixie CLI`
+   - Then run erase + flash.
 
 3. On the newly flashed eMMC boot partition, edit `/boot/armbianEnv.txt`.
-- First copy your new `rootdev=UUID=...` line (example: `rootdev=UUID=938afde5-6689-4a1a-a044-680f6247d523`).
-- Replace the rest with:
+   - First copy your new `rootdev=UUID=...` line (example: `rootdev=UUID=938afde5-6689-4a1a-a044-680f6247d523`).
+   - Replace the rest with:
 
 ```ini
 verbosity=1
@@ -78,8 +79,8 @@ If you skip this, first boot should expand it.
 Note for macOS users: you will need a VM and pass the eMMC through to access its filesystem after flashing. UTM + a simple Linux VM (for example Debian XFCE) works well.
 
 4. Boot the printer and complete first login.
-- Option A: Ethernet + SSH (`root` / `1234` on first login).
-- Option B: Keyboard + HDMI monitor directly on the printer.
+   - Option A: Ethernet + SSH (`root` / `1234` on first login).
+   - Option B: Keyboard + HDMI monitor directly on the printer.
 
 If you plan to use Wi-Fi, do not configure it during first-login prompts. Choose `N`, then set it later with:
 
@@ -87,7 +88,7 @@ If you plan to use Wi-Fi, do not configure it during first-login prompts. Choose
 sudo armbian-config
 ```
 
-5. Mask network wait-online to avoid boot delays (reference: https://github.com/Rappetor/Sovol-SV08-Mainline/issues/229#issuecomment-3765616568):
+5. Mask network wait-online to avoid boot delays (reference: [Rappetor issue comment](https://github.com/Rappetor/Sovol-SV08-Mainline/issues/229#issuecomment-3765616568)):
 
 ```bash
 systemctl disable systemd-networkd-wait-online.service
@@ -107,18 +108,18 @@ git clone https://github.com/dw-0/kiauh.git
 ./kiauh/kiauh.sh
 ```
 
-Credit for parts of this setup flow: ljg-dev
-https://github.com/ljg-dev/sovol-sv08-mainline/tree/main
+Credit for parts of this setup flow:
+- [ljg-dev](https://github.com/ljg-dev/sovol-sv08-mainline/tree/main)
 
 ---
 
 ## Install Core Software
 
 1. In KIAUH, install:
-- Klipper
-- Moonraker
-- Mainsail
-- Crowsnest
+   - Klipper
+   - Moonraker
+   - Mainsail
+   - Crowsnest
 
 Then reboot.
 
@@ -231,10 +232,10 @@ sudo reboot now
 
 5. Upload your `printer.cfg`, then comment out all MCU sections (`mcu`, `extruder_mcu`, `hot_mcu`) and reboot.
 
-This allows clean CAN UUID detection before flashing.
+This ensures clean CAN UUID detection before flashing.
 
 Notes:
-- Sovol hardcodes UUIDs for mainboard/toolhead/chamber.
+- Sovol uses fixed UUID mappings for mainboard/toolhead/chamber in stock firmware.
 - UUIDs change after flashing.
 
 6. Query devices and save the output:
@@ -261,7 +262,7 @@ If you do not see your devices, revisit the CAN setup and power-cycle sequence.
 
 ## Firmware Binaries
 
-Prebuilt binaries are in [bins](./bins).
+Prebuilt binaries are in [bins](./bins) if you do not want to build your own.
 
 Katapult:
 - `Deployer_Zero_Host_H743_128kb` is for flashing over the stock Sovol bootloader via `flashtool.py`.
@@ -273,9 +274,11 @@ Klipper:
 - Host and toolhead Klipper binaries can be flashed via `flashtool.py`.
 - You can also build your own using the menuconfig values below.
 
-## Flash Mainboard
+## Build and Flash Mainboard
 
-Sovol's bootloader uses a 128 KiB offset. Through testing, the MCU appears to behave like an STM32H743-class part (2MB flash behavior), not a strict H750 configuration.
+Sovol's bootloader uses a 128 KiB offset. Through testing, the MCU appears to behave like an STM32H743-class part (2 MB flash behavior), not a strict H750 configuration.
+
+Method A: Prebuilt bins
 
 You can either:
 - Flash `Katapult_Zero_Host_H743_128kb.bin` with ST-LINK, or
@@ -287,30 +290,74 @@ Example deployer flash command (replace UUID):
 ~/katapult/scripts/flashtool.py -f Deployer_Zero_Host_H743_128kb.bin -u <HOST_UUID>
 ```
 
-Then flash Klipper to host (example):
+Then flash Klipper to host:
 
 ```bash
 ~/katapult/scripts/flashtool.py -f Klipper_Zero_Host_H743_128kb.bin -d /dev/ttyACM0
 ```
 
-Mainboard `make menuconfig` reference:
+Method B: Build from source
+
+Credit for board-level details:
+- [Vlad (vvuk)](https://github.com/vvuk/printer-configs/wiki/Kalico-on-the-Sovol-Zero)
+
+Mainboard Katapult `make menuconfig` reference:
 
 ```text
 STM32H743
-128KiB deployment offset [Katapult optional]
-25 MHz crystal clock
-USB to CAN bus bridge (USB on PA11/PA12) [Klipper]
-OR
+25 MHz clock
+8KiB Application offset
 USB on PA11/PA12 [Katapult]
-CAN bus on PB8/PB9 [Klipper]
+Balanced Speed/Size (-O2) [Katapult]
 GPIO pins to set at micro-controller startup: !PE11,!PB0
 ```
 
 `!PE11,!PB0` keeps aux/exhaust fans from blasting at full speed before Klipper takes control.
 
-Credit for board-level details:
-Vlad (vvuk)
-https://github.com/vvuk/printer-configs/wiki/Kalico-on-the-Sovol-Zero
+Build and flash steps:
+
+1. Build firmware:
+
+```bash
+cd ~/katapult
+make menuconfig
+make clean
+make -j4
+```
+
+Output: `~/katapult/out/katapult.bin`
+
+2. Find current UUIDs:
+
+```bash
+sudo service klipper stop
+~/katapult/scripts/flashtool.py -q
+```
+
+3. Flash mainboard (replace UUID):
+
+```bash
+~/katapult/scripts/flashtool.py -f ~/katapult/out/katapult.bin -u <MAINBOARD_UUID>
+```
+
+4. Query again and record the changed UUID (this is your new mainboard UUID):
+
+```bash
+~/katapult/scripts/flashtool.py -q
+```
+
+Mainboard Klipper `make menuconfig` reference:
+
+```text
+STM32H743
+25 MHz crystal clock
+8KiB Application offset
+USB to CAN bus bridge (USB on PA11/PA12) [Klipper]
+CAN bus on PB8/PB9 [Klipper]
+GPIO pins to set at micro-controller startup: !PE11,!PB0
+```
+
+`!PE11,!PB0` keeps aux/exhaust fans from blasting at full speed before Klipper takes control.
 
 Build and flash steps:
 
@@ -320,7 +367,7 @@ Build and flash steps:
 cd ~/klipper
 make menuconfig
 make clean
-make
+make -j4
 ```
 
 Output: `~/klipper/out/klipper.bin`
@@ -338,7 +385,7 @@ sudo service klipper stop
 ~/katapult/scripts/flashtool.py -f ~/klipper/out/klipper.bin -u <MAINBOARD_UUID>
 ```
 
-4. Query again and record the changed UUID (that is your new mainboard UUID):
+4. Query again and record the changed UUID (this is your new mainboard UUID):
 
 ```bash
 ~/katapult/scripts/flashtool.py -q
@@ -351,22 +398,65 @@ sudo service klipper stop
 
 Toolhead and chamber heater use the same firmware settings, and those settings are different from the mainboard.
 
-Toolhead/chamber `make menuconfig` reference:
+Credit:
+- [Vlad (vvuk)](https://github.com/vvuk/printer-configs/wiki/Kalico-on-the-Sovol-Zero)
+
+Toolhead/chamber Katapult `make menuconfig` reference:
 
 ```text
 STM32F103
-8KiB deployment offset [optional]
 8 MHz clock
-8KiB application offset
+8KiB Application offset
 CAN bus on PB8/PB9
-Balanced Speed/Size (-O2)
+Balanced Speed/Size (-O2) [Katapult]
 ```
 
-Credit:
-Vlad (vvuk)
-https://github.com/vvuk/printer-configs/wiki/Kalico-on-the-Sovol-Zero
+Build and flash steps:
 
-Steps:
+1. Build firmware:
+
+```bash
+cd ~/katapult
+make menuconfig
+make clean
+make -j4
+```
+
+Output: `~/katapult/out/katapult.bin`
+
+2. Query UUIDs, then flash one board at a time (replace UUID each time):
+
+```bash
+sudo service klipper stop
+~/katapult/scripts/flashtool.py -q
+~/katapult/scripts/flashtool.py -f ~/katapult/out/katapult.bin -u <TOOLHEAD_OR_CHAMBER_UUID>
+~/katapult/scripts/flashtool.py -q
+```
+
+After each flash, the UUID that changes is the one you just flashed.
+
+If you lose track:
+- Power off.
+- Unplug toolhead CAN.
+- Boot and query (remaining new UUID is chamber).
+- Power off, reconnect toolhead CAN, boot and query again (newly appearing UUID is toolhead).
+
+3. Start Klipper:
+
+```bash
+sudo service klipper start
+```
+
+Toolhead/chamber Klipper `make menuconfig` reference:
+
+```text
+STM32F103
+8 MHz clock
+8KiB Application offset
+CAN bus on PB8/PB9
+```
+
+Build and flash steps:
 
 1. Build firmware:
 
@@ -374,7 +464,7 @@ Steps:
 cd ~/klipper
 make menuconfig
 make clean
-make
+make -j4
 ```
 
 Output: `~/klipper/out/klipper.bin`
@@ -403,9 +493,8 @@ sudo service klipper start
 ```
 
 Credit for CAN flashing workflow:
-Esoterical
-https://canbus.esoterical.online/Getting_Started.html
-https://canbus.esoterical.online/toolhead_flashing.html
+- [Esoterical - Getting Started](https://canbus.esoterical.online/Getting_Started.html)
+- [Esoterical - Toolhead Flashing](https://canbus.esoterical.online/toolhead_flashing.html)
 
 ---
 
@@ -413,7 +502,7 @@ https://canbus.esoterical.online/toolhead_flashing.html
 
 Recovery files are available in [recovery](./recovery). These can be flashed with ST-LINK to return to Sovol firmware.
 
-Also reference Rappetor's guide (Step 6/Step 7).
+Also reference [Rappetor's guide (Step 6/Step 7)](https://github.com/Rappetor/Sovol-SV08-Mainline?tab=readme-ov-file#step-6---stock-firmware-backup) 
 
 ---
 
@@ -467,7 +556,7 @@ END_PRINT
 Calibrate at the bed temperature you use most often (for example ASA users may calibrate around 90C).
 
 General reference (with Zero-specific differences):
-https://github.com/asnajder/sv08-config/blob/main/README.md
+[asnajder/sv08-config README](https://github.com/asnajder/sv08-config/blob/main/README.md)
 
 Use this repo's `sovol_eddy.cfg` as a baseline and keep software I2C enabled (hardware I2C does not work reliably in this setup).
 
@@ -499,7 +588,7 @@ Try adding `Nice=-10` to Klipper service and restart:
 sudo nano /etc/systemd/system/klipper.service
 ```
 
-Then restart Klipper/system.
+Then restart Klipper and/or the system.
 
 > [!IMPORTANT]
 > Eddy calibration note
@@ -521,3 +610,27 @@ Then restart Klipper/system.
 6. Run final tuning (`PID`, `SHAPER_CALIBRATE`, etc.).
 
 7. Print.
+
+## Updater Script
+
+This can be used to update the MCUs automatically in the future.
+
+1. Download the updater [script](./update_klipper_mcus_svzero.sh).
+
+2. Upload `update_klipper_mcus_svzero.sh` to your printer home directory (`cd ~/`).
+
+3. Make it executable:
+
+```bash
+chmod +x ~/update_klipper_mcus_svzero.sh
+```
+
+4. Edit the script and set the UUID values for HOST, TOOLHEAD, and CHAMBER (if installed).
+
+5. Run the script:
+
+```bash
+~/update_klipper_mcus_svzero.sh
+```
+
+Use the same `make menuconfig` values referenced in this guide when prompted.
