@@ -1,6 +1,6 @@
 # Mainline Sovol Zero (Klipper, Armbian Trixie)
 
-Special thanks to Leoboi420, Teapot-Apple, matt73210, Atomique13, J&B, jedi 2^10, wildBill, Rappetor, vvuk, and everyone else in Discord who shared information and testing results.
+Special thanks to Leoboi420, Teapot-Apple, matt73210, Atomique13, J&B, jedi 2^10, wildBill, Rappetor, vvuk, and everyone else who shared information and testing results.
 
 ## Overview
 
@@ -26,7 +26,7 @@ Special thanks to Leoboi420, Teapot-Apple, matt73210, Atomique13, J&B, jedi 2^10
 
 ## Prerequisites
 
-- 32GB eMMC (the stock Sovol 8GB eMMC will not work)
+- 32GB eMMC (the stock Sovol 8GB eMMC will NOT work)
 - eMMC reader
 - Armbian Imager on a PC
 - USB keyboard + HDMI monitor (or SSH over Ethernet)
@@ -36,7 +36,7 @@ Special thanks to Leoboi420, Teapot-Apple, matt73210, Atomique13, J&B, jedi 2^10
 ## Safety and Warnings
 
 - Power off and unplug the printer before touching electronics or swapping eMMC modules.
-- A mistake during this process can brick your printer. Keep an ST-LINK available before you begin.
+- A mistake during this processes can brick your printer. Keep an ST-LINK available before you begin.
 
 ---
 
@@ -265,13 +265,13 @@ If you do not see your devices, revisit the CAN setup and power-cycle sequence.
 Prebuilt binaries are in [bins](./bins) if you do not want to build your own.
 
 Katapult:
-- `Deployer_Zero_Host_H743_128kb` is for flashing over the stock Sovol bootloader via `flashtool.py`.
+- `Deployer_Zero_Host_<H743>_128kb.bin` is for flashing over the stock Sovol bootloader via `flashtool.py`.
 - Do not use the deployer as standalone firmware or with ST-LINK.
 - After deployer flash, immediately flash Klipper firmware.
-- `Katapult_Zero_Host_H743_128kb` is intended for ST-LINK flashing.
+- `Katapult_Zero_Host_H743_128kb.bin` is intended for ST-LINK flashing.
 
 Klipper:
-- Host and toolhead Klipper binaries can be flashed via `flashtool.py`.
+- Host, toolhead and chamber Klipper binaries can be flashed via `flashtool.py`.
 - You can also build your own using the menuconfig values below.
 
 ## Build and Flash Mainboard
@@ -553,7 +553,7 @@ END_PRINT
 
 5. Calibrate Eddy.
 
-Calibrate at the bed temperature you use most often (for example ASA users may calibrate around 90C).
+Calibrate at the bed temperature you normally print at. The bed must be heated, never calibrate on a cold bed. (For example, if you print ASA, calibrate at around 90 °C or more)
 
 General reference (with Zero-specific differences):
 [asnajder/sv08-config README](https://github.com/asnajder/sv08-config/blob/main/README.md)
